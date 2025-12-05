@@ -1,0 +1,12 @@
+[Unit]
+Description=Pastebin Service
+After=network.target
+
+[Service]
+Restart=always
+ExecStart=/usr/local/bin/pastebinserve
+Environment=PORT=3333
+WorkingDirectory=/etc/pastebinserve
+
+[Install]
+WantedBy=multi-user.target
