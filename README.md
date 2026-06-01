@@ -1,6 +1,7 @@
 # notesd
 
-Git-backed notes service. Every write is a commit; you get history for free.
+Git-backed notes (micro) service. Every write is a commit; you get history for
+free. Aims to be the simplest note taking app service.
 
 ## API
 
@@ -18,7 +19,15 @@ curl    "$URL"                               # list: <id>\t<preview>
 
 `PUT` is an alias for `POST`. Writes return the commit SHA in `X-Commit`.
 Send `Accept: application/json` on `GET /` for JSON output.
-Browsers (`Accept: text/html`) get a small editor UI.
+
+## Web interface
+
+Browsers (`Accept: text/html`) get a small editor UI — create, view, and edit
+notes without curl. `GET /` lists all notes with previews, `GET /$ID` opens
+an editor (empty for a new id), and `GET /$ID/history` lists revisions.
+See screenshots at <https://cstml.github.io/notesd/>.
+
+## Ids & Names
 
 Ids are normalized to `[a-z0-9_-]+`: lowercased, other chars collapsed to `-`,
 trimmed, capped at 128 chars.
