@@ -27,6 +27,12 @@ notes without curl. `GET /` lists all notes with previews, `GET /$ID` opens
 an editor (empty for a new id), and `GET /$ID/history` lists revisions.
 See screenshots at <https://cstml.github.io/notesd/>.
 
+## Storage
+
+Notes are stored as plain text files in `STORAGE_PATH` (one file per note,
+filename = id), and the directory is a normal git repo. You can `cat`, `grep`,
+edit, or `git log` them directly on disk — no database, no binary blobs.
+
 ## Ids & Names
 
 Ids are normalized to `[a-z0-9_-]+`: lowercased, other chars collapsed to `-`,
