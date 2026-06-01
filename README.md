@@ -1,6 +1,6 @@
-# Pastebinserve
+# notesd
 
-Git-backed pastebin. Every write is a commit; you get history for free.
+Git-backed notes service. Every write is a commit; you get history for free.
 
 ## API
 
@@ -18,13 +18,18 @@ curl    "$URL"                               # list: <id>\t<preview>
 
 `PUT` is an alias for `POST`. Writes return the commit SHA in `X-Commit`.
 Send `Accept: application/json` on `GET /` for JSON output.
+Browsers (`Accept: text/html`) get a small editor UI.
 
 Ids are normalized to `[a-z0-9_-]+`: lowercased, other chars collapsed to `-`,
 trimmed, capped at 128 chars.
 
 ## Config
 
-`PORT` (default `3333`), `STORAGE_PATH` (default `data`, auto-init as git repo).
+- `PORT` (default `3333`)
+- `STORAGE_PATH` (default `data`, auto-init as git repo)
+- `GIT_REMOTE` (optional) — pull `--ff-only` before each request (5s timeout)
+  and push asynchronously after every commit.
+
 See `.env.example`.
 
 ## Install
@@ -35,3 +40,5 @@ sudo make install   # binary + systemd unit (honors DESTDIR, PREFIX)
 sudo make enable
 sudo make uninstall
 ```
+
+Operator config lives at `/etc/notesd/.env` (see `notesd.service`).

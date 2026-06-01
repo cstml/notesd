@@ -5,22 +5,22 @@ PREFIX  ?= /usr/local
 BINDIR   = $(DESTDIR)$(PREFIX)/bin
 UNITDIR  = $(DESTDIR)/etc/systemd/system
 
-build: bin/pastebinserve
+build: bin/notesd
 
-bin/pastebinserve: go.mod main.go
-	go build -o bin/pastebinserve .
+bin/notesd: go.mod main.go
+	go build -o bin/notesd .
 
-install: bin/pastebinserve pastebinserve.service
-	install -d $(BINDIR) $(UNITDIR) $(DESTDIR)/etc/pastebinserve
-	install -m 0755 bin/pastebinserve $(BINDIR)/pastebinserve
-	install -m 0644 pastebinserve.service $(UNITDIR)/pastebinserve.service
+install: bin/notesd notesd.service
+	install -d $(BINDIR) $(UNITDIR) $(DESTDIR)/etc/notesd
+	install -m 0755 bin/notesd $(BINDIR)/notesd
+	install -m 0644 notesd.service $(UNITDIR)/notesd.service
 	[ -n "$(DESTDIR)" ] || systemctl daemon-reload
 
 enable:
-	systemctl enable --now pastebinserve
+	systemctl enable --now notesd
 
 uninstall:
-	-systemctl disable --now pastebinserve
-	rm -f $(BINDIR)/pastebinserve
-	rm -f $(UNITDIR)/pastebinserve.service
+	-systemctl disable --now notesd
+	rm -f $(BINDIR)/notesd
+	rm -f $(UNITDIR)/notesd.service
 	[ -n "$(DESTDIR)" ] || systemctl daemon-reload

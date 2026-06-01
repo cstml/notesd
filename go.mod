@@ -1,4 +1,4 @@
-module github.com/cstml/pastebin
+module github.com/cstml/notesd
 
 go 1.25.4
 

@@ -1,0 +1,19 @@
+[Unit]
+Description=notesd — git-backed notes service
+After=network.target
+
+[Service]
+Restart=always
+ExecStart=/usr/local/bin/notesd
+WorkingDirectory=/etc/notesd
+
+# Defaults; override in /etc/notesd/.env
+Environment=PORT=3333
+Environment=STORAGE_PATH=/var/lib/notesd
+
+# Optional env file (won't fail if missing).
+# Put PORT / STORAGE_PATH / GIT_REMOTE overrides here.
+EnvironmentFile=-/etc/notesd/.env
+
+[Install]
+WantedBy=multi-user.target

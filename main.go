@@ -81,10 +81,10 @@ func ensureRepo() error {
 		if _, err := git("init", "-q", "-b", "main"); err != nil {
 			return err
 		}
-		if _, err := git("config", "user.email", "pastebin@localhost"); err != nil {
+		if _, err := git("config", "user.email", "notesd@localhost"); err != nil {
 			return err
 		}
-		if _, err := git("config", "user.name", "pastebin"); err != nil {
+		if _, err := git("config", "user.name", "notesd"); err != nil {
 			return err
 		}
 	}
