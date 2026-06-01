@@ -1,0 +1,16 @@
+services:
+  notesd:
+    build: .
+    container_name: notesd
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+    volumes:
+      - notesd-data:/data
+    environment:
+      PORT: "3333"
+      STORAGE_PATH: /data
+      # GIT_REMOTE: git@github.com:you/notes.git
+
+volumes:
+  notesd-data:

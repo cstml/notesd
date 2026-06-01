@@ -1,0 +1,7 @@
+.git
+data
+bin
+*.md
+.github
+notesd.service
+screenshot*.png
