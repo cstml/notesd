@@ -220,6 +220,7 @@ func main() {
 		defer req.Body.Close()
 		sha, err := writeAndCommit(id, req.Body, "write "+id)
 		if err != nil {
+			log.Printf("write %s: %v", id, err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -236,6 +237,7 @@ func main() {
 		defer req.Body.Close()
 		sha, err := writeAndCommit(id, req.Body, "write "+id)
 		if err != nil {
+			log.Printf("write %s: %v", id, err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -330,6 +332,7 @@ func main() {
 	r.Get("/", func(w http.ResponseWriter, req *http.Request) {
 		files, err := os.ReadDir(storage_path)
 		if err != nil {
+			log.Printf("readdir %s: %v", storage_path, err)
 			http.Error(w, "Could not read directory", http.StatusInternalServerError)
 			return
 		}
@@ -376,10 +379,12 @@ func main() {
 			return
 		}
 		if _, err := git("rm", "-q", "--", id); err != nil {
+			log.Printf("delete %s (rm): %v", id, err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := git("commit", "-q", "-m", "delete "+id); err != nil {
+			log.Printf("delete %s (commit): %v", id, err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
