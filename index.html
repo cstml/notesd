@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>notesd — git-backed notes service</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; max-width: 720px; margin: 3rem auto; padding: 0 1rem; }
+  h1 { margin-bottom: 0.2rem; }
+  .tag { opacity: 0.7; }
+  pre { background: rgba(127,127,127,0.12); padding: 1rem; overflow-x: auto; border-radius: 6px; }
+  code { background: rgba(127,127,127,0.12); padding: 0.1em 0.3em; border-radius: 3px; }
+  a { color: inherit; }
+  hr { border: none; border-top: 1px solid rgba(127,127,127,0.3); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<h1>notesd</h1>
+<p class="tag">Tiny git-backed notes/paste server in Go. Every write is a commit; you get history for free.</p>
+
+<p><a href="https://github.com/cstml/notesd">Source on GitHub →</a></p>
+
+<h2>API</h2>
+<pre><code>URL=http://localhost:3333
+
+curl -X POST   -d "..." "$URL"               # auto id (&lt;unix&gt;-&lt;rand&gt;)
+curl -X POST   -d "..." "$URL/$ID"           # create or overwrite
+curl    "$URL/$ID"                           # latest content
+curl    "$URL/$ID?version=&lt;sha&gt;"             # content at commit (prefix ok)
+curl    "$URL/$ID/history"                   # &lt;sha&gt; &lt;unix-time&gt; &lt;preview&gt;
+curl -X DELETE "$URL/$ID"                    # delete (history preserved)
+curl    "$URL"                               # list: &lt;id&gt;\t&lt;preview&gt;
+</code></pre>
+
+<p><code>PUT</code> is an alias for <code>POST</code>. Writes return the commit SHA in <code>X-Commit</code>.
+Send <code>Accept: application/json</code> on <code>GET /</code> for JSON. Browsers get a small editor UI.</p>
+
+<h2>Config</h2>
+<ul>
+  <li><code>PORT</code> (default <code>3333</code>)</li>
+  <li><code>STORAGE_PATH</code> (default <code>data</code>, auto-init as git repo)</li>
+  <li><code>GIT_REMOTE</code> (optional) — pull <code>--ff-only</code> before each request, push async after commit</li>
+</ul>
+
+<h2>Install</h2>
+<pre><code>make build
+sudo make install   # binary + systemd unit
+sudo make enable
+</code></pre>
+
+<hr>
+<p class="tag"><a href="https://github.com/cstml/notesd">cstml/notesd</a></p>
+</body>
+</html>
