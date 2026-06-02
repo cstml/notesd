@@ -59,6 +59,18 @@ go install github.com/cstml/notesd@latest
 notesd --help
 ```
 
+### As a container
+
+```sh
+docker build -t notesd .
+docker run -d --name notesd -p 3333:3333 -v notesd-data:/data notesd
+# or
+docker compose up -d
+```
+
+State lives in the `/data` volume (git repo). Env vars `PORT`, `STORAGE_PATH`,
+`GIT_REMOTE` work the same as the CLI flags — see `compose.yml`.
+
 ### As a service 
 
 If you want to run it as a service:
