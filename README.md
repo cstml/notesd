@@ -40,12 +40,15 @@ trimmed, capped at 128 chars.
 
 ## Config
 
-- `PORT` (default `3333`)
-- `STORAGE_PATH` (default `data`, auto-init as git repo)
-- `GIT_REMOTE` (optional) — pull `--ff-only` before each request (5s timeout)
-  and push asynchronously after every commit.
+Configurable via CLI flags or env vars (flags override env):
 
-See `.env.example`.
+| Flag | Env | Default | Description |
+|---|---|---|---|
+| `-port` | `PORT` | `3333` | TCP port to listen on |
+| `-storage` | `STORAGE_PATH` | `data` | git-backed storage dir (auto-init) |
+| `-git-remote` | `GIT_REMOTE` | _(unset)_ | optional remote: pull `--ff-only` (5s timeout) before each request, async push after each commit |
+
+Run `notesd --help` for the full flag listing. See `.env.example`.
 
 ## Install
 

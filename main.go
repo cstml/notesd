@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -44,15 +45,42 @@ func normalizeID(s string) string {
 	return s
 }
 
+var gitRemote string
+
+func envOr(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
+}
+
+func parseFlags(args []string) error {
+	fs := flag.NewFlagSet("notesd", flag.ContinueOnError)
+	fs.StringVar(&storage_path, "storage", envOr("STORAGE_PATH", "data"), "path to the git-backed storage directory (env: STORAGE_PATH)")
+	fs.StringVar(&port, "port", envOr("PORT", "3333"), "TCP port to listen on (env: PORT)")
+	fs.StringVar(&gitRemote, "git-remote", os.Getenv("GIT_REMOTE"), "optional git remote URL to push/pull on writes (env: GIT_REMOTE)")
+	fs.Usage = func() {
+		fmt.Fprintf(fs.Output(), `notesd - a tiny git-backed paste/notes server
+
+Usage:
+  notesd [flags]
+
+Flags:
+`)
+		fs.PrintDefaults()
+	}
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if gitRemote != "" {
+		os.Setenv("GIT_REMOTE", gitRemote)
+	}
+	return nil
+}
+
 func init() {
-	storage_path = os.Getenv("STORAGE_PATH")
-	if storage_path == "" {
-		storage_path = "data"
-	}
-	port = os.Getenv("PORT")
-	if port == "" {
-		port = "3333"
-	}
+	storage_path = envOr("STORAGE_PATH", "data")
+	port = envOr("PORT", "3333")
 }
 
 func git(args ...string) (string, error) {
@@ -201,6 +229,9 @@ func writeAndCommit(id string, body io.Reader, msg string) (string, error) {
 }
 
 func main() {
+	if err := parseFlags(os.Args[1:]); err != nil {
+		os.Exit(2)
+	}
 	if err := ensureRepo(); err != nil {
 		panic(err)
 	}

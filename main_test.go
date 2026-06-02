@@ -44,6 +44,73 @@ func TestPreviewString(t *testing.T) {
 	}
 }
 
+func TestParseFlags(t *testing.T) {
+	prevS, prevP, prevR := storage_path, port, gitRemote
+	prevEnvS, prevEnvP, prevEnvR := os.Getenv("STORAGE_PATH"), os.Getenv("PORT"), os.Getenv("GIT_REMOTE")
+	defer func() {
+		storage_path, port, gitRemote = prevS, prevP, prevR
+		os.Setenv("STORAGE_PATH", prevEnvS)
+		os.Setenv("PORT", prevEnvP)
+		os.Setenv("GIT_REMOTE", prevEnvR)
+	}()
+
+	// explicit flags
+	os.Unsetenv("STORAGE_PATH")
+	os.Unsetenv("PORT")
+	os.Unsetenv("GIT_REMOTE")
+	gitRemote = ""
+	if err := parseFlags([]string{"-storage", "/tmp/x", "-port", "9999", "-git-remote", "git@example.com:r.git"}); err != nil {
+		t.Fatalf("parseFlags: %v", err)
+	}
+	if storage_path != "/tmp/x" || port != "9999" || gitRemote != "git@example.com:r.git" {
+		t.Errorf("flags: got %q %q %q", storage_path, port, gitRemote)
+	}
+	if os.Getenv("GIT_REMOTE") != "git@example.com:r.git" {
+		t.Errorf("GIT_REMOTE not propagated to env")
+	}
+
+	// env fallback
+	os.Setenv("STORAGE_PATH", "/from/env")
+	os.Setenv("PORT", "4242")
+	os.Unsetenv("GIT_REMOTE")
+	gitRemote = ""
+	if err := parseFlags([]string{}); err != nil {
+		t.Fatalf("parseFlags env: %v", err)
+	}
+	if storage_path != "/from/env" || port != "4242" {
+		t.Errorf("env: got %q %q", storage_path, port)
+	}
+
+	// defaults
+	os.Unsetenv("STORAGE_PATH")
+	os.Unsetenv("PORT")
+	os.Unsetenv("GIT_REMOTE")
+	gitRemote = ""
+	if err := parseFlags([]string{}); err != nil {
+		t.Fatalf("parseFlags defaults: %v", err)
+	}
+	if storage_path != "data" || port != "3333" {
+		t.Errorf("defaults: got %q %q", storage_path, port)
+	}
+
+	// --help returns ErrHelp without panicking
+	if err := parseFlags([]string{"--help"}); err == nil {
+		t.Error("--help should return an error (flag.ErrHelp)")
+	}
+}
+
+func TestEnvOr(t *testing.T) {
+	os.Unsetenv("NOTESD_TEST_X")
+	if got := envOr("NOTESD_TEST_X", "def"); got != "def" {
+		t.Errorf("unset: got %q", got)
+	}
+	os.Setenv("NOTESD_TEST_X", "set")
+	defer os.Unsetenv("NOTESD_TEST_X")
+	if got := envOr("NOTESD_TEST_X", "def"); got != "set" {
+		t.Errorf("set: got %q", got)
+	}
+}
+
 func TestWantsHTML(t *testing.T) {
 	mk := func(a string) *http.Request {
 		r := httptest.NewRequest("GET", "/", nil)
