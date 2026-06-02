@@ -47,17 +47,34 @@ curl    "$URL"                               # list: &lt;id&gt;\t&lt;preview&gt;
 Send <code>Accept: application/json</code> on <code>GET /</code> for JSON. Browsers get a small editor UI.</p>
 
 <h2>Config</h2>
+<p>Configurable via CLI flags or env vars (flags override env). Run <code>notesd --help</code> for the full listing.</p>
 <ul>
-  <li><code>PORT</code> (default <code>3333</code>)</li>
-  <li><code>STORAGE_PATH</code> (default <code>data</code>, auto-init as git repo)</li>
-  <li><code>GIT_REMOTE</code> (optional) — pull <code>--ff-only</code> before each request, push async after commit</li>
+  <li><code>-port</code> / <code>PORT</code> (default <code>3333</code>) — TCP port to listen on</li>
+  <li><code>-storage</code> / <code>STORAGE_PATH</code> (default <code>data</code>) — git-backed storage dir (auto-init)</li>
+  <li><code>-git-remote</code> / <code>GIT_REMOTE</code> (optional) — pull <code>--ff-only</code> before each request, push async after commit</li>
+  <li><code>--version</code> — print version and exit</li>
 </ul>
 
 <h2>Install</h2>
+<p>With <code>go install</code>:</p>
+<pre><code>go install github.com/cstml/notesd@latest
+notesd --help
+</code></pre>
+
+<p>As a container:</p>
+<pre><code>docker build -t notesd .
+docker run -d --name notesd -p 3333:3333 -v notesd-data:/data notesd
+# or: docker compose up -d
+</code></pre>
+
+<p>As a systemd service (from source):</p>
 <pre><code>make build
 sudo make install   # binary + systemd unit
 sudo make enable
 </code></pre>
+
+<h2>License</h2>
+<p><a href="https://github.com/cstml/notesd/blob/master/LICENSE">AGPL-3.0-or-later</a>. If you run a modified version as a network service, you must offer the modified source to its users.</p>
 
 <hr>
 <p class="tag"><a href="https://github.com/cstml/notesd">cstml/notesd</a></p>
