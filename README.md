@@ -52,11 +52,27 @@ Run `notesd --help` for the full flag listing. See `.env.example`.
 
 ## Install
 
+With `go install`:
+
+```sh
+go install github.com/cstml/notesd@latest
+notesd --help
+```
+
+### As a service 
+
+If you want to run it as a service:
+
 ```sh
 make build
-sudo make install   # binary + systemd unit (honors DESTDIR, PREFIX)
+sudo make install
 sudo make enable
-sudo make uninstall
+```
+
+To uninstall 
+
+```sh
+sudo make uninstall 
 ```
 
 Operator config lives at `/etc/notesd/.env` (see `notesd.service`).
