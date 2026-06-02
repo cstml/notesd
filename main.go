@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -47,6 +48,44 @@ func normalizeID(s string) string {
 
 var gitRemote string
 
+// version is overridden via -ldflags "-X main.version=...". Falls back to
+// module/VCS info embedded by the Go toolchain (set automatically by
+// `go install module@vX.Y.Z` and by `go build` inside a git checkout).
+var version = ""
+
+func versionString() string {
+	if version != "" {
+		return version
+	}
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "unknown"
+	}
+	v := info.Main.Version
+	if v == "" || v == "(devel)" {
+		v = "devel"
+	}
+	var rev, dirty string
+	for _, s := range info.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			if len(s.Value) >= 8 {
+				rev = s.Value[:8]
+			} else {
+				rev = s.Value
+			}
+		case "vcs.modified":
+			if s.Value == "true" {
+				dirty = "-dirty"
+			}
+		}
+	}
+	if rev != "" {
+		return fmt.Sprintf("%s (%s%s)", v, rev, dirty)
+	}
+	return v
+}
+
 func envOr(key, def string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
@@ -59,6 +98,7 @@ func parseFlags(args []string) error {
 	fs.StringVar(&storage_path, "storage", envOr("STORAGE_PATH", "data"), "path to the git-backed storage directory (env: STORAGE_PATH)")
 	fs.StringVar(&port, "port", envOr("PORT", "3333"), "TCP port to listen on (env: PORT)")
 	fs.StringVar(&gitRemote, "git-remote", os.Getenv("GIT_REMOTE"), "optional git remote URL to push/pull on writes (env: GIT_REMOTE)")
+	showVersion := fs.Bool("version", false, "print version and exit")
 	fs.Usage = func() {
 		fmt.Fprintf(fs.Output(), `notesd - a tiny git-backed paste/notes server
 
@@ -71,6 +111,10 @@ Flags:
 	}
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+	if *showVersion {
+		fmt.Println(versionString())
+		os.Exit(0)
 	}
 	if gitRemote != "" {
 		os.Setenv("GIT_REMOTE", gitRemote)

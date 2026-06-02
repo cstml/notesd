@@ -99,6 +99,19 @@ func TestParseFlags(t *testing.T) {
 	}
 }
 
+func TestVersionString(t *testing.T) {
+	prev := version
+	defer func() { version = prev }()
+	version = "v1.2.3"
+	if got := versionString(); got != "v1.2.3" {
+		t.Errorf("override: got %q", got)
+	}
+	version = ""
+	if got := versionString(); got == "" {
+		t.Error("fallback should not be empty")
+	}
+}
+
 func TestEnvOr(t *testing.T) {
 	os.Unsetenv("NOTESD_TEST_X")
 	if got := envOr("NOTESD_TEST_X", "def"); got != "def" {
